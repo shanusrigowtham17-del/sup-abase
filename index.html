@@ -6,7 +6,6 @@
     <title>Premium Auth</title>
     
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <script src="https://cdn.tailwindcss.com"></script>
     
     <script>
@@ -123,8 +122,8 @@
     </div>
 
     <script>
-        // --- 1. YOUR CREDENTIALS HERE ---
-        const SUPABASE_URL = 'https://ndgrpmglkdmdvqmhzxrp.supabase.co/rest/v1/';
+        // --- 1. YOUR CREDENTIALS HERE (FIXED) ---
+        const SUPABASE_URL = 'https://ndgrpmglkdmdvqmhzxrp.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kZ3JwbWdsa2RtZHZxbWh6eHJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNzU2OTAsImV4cCI6MjA5OTc1MTY5MH0.Sett9S-neEhpdQQK8bes4ZEqLLRy_azKQ3AuVgPzVV0';
         
         const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);

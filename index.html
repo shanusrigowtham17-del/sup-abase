@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Supabase Auth Demo</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: sans-serif; margin: 40px; max-width: 400px; }
+        .form-group { margin-bottom: 15px; }
+        label { display: block; margin-bottom: 5px; }
+        input { width: 100%; padding: 8px; box-sizing: border-box; }
+        button { padding: 10px 15px; cursor: pointer; margin-right: 5px; }
+        .hidden { display: none; }
+        #status { margin-top: 20px; padding: 10px; border: 1px solid #ccc; background: #f9f9f9; }
+    </style>
+</head>
+<body>
+
+    <h2>Supabase Authentication</h2>
+
+    <div id="auth-container">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" placeholder="••••••••">
+        </div>
+        <button id="btn-login">Log In</button>
+        <button id="btn-signup">Sign Up</button>
+    </div>
+
+    <div id="dashboard-container" class="hidden">
+        <p>Welcome, <span id="user-email"></span>!</p>
+        <button id="btn-logout">Log Out</button>
+    </div>
+
+    <div id="status">Loading...</div>
+
+    <script>
+        // 1. REPLACE THESE WITH YOUR ACTUAL SUPABASE CREDENTIALS
+        const SUPABASE_URL = 'https://ndgrpmglkdmdvqmhzxrp.supabase.co/rest/v1/';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kZ3JwbWdsa2RtZHZxbWh6eHJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNzU2OTAsImV4cCI6MjA5OTc1MTY5MH0.Sett9S-neEhpdQQK8bes4ZEqLLRy_azKQ3AuVgPzVV0';
+
+        // 2. Initialize the Supabase Client
+        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+        // DOM Elements
+        const authContainer = document.getElementById('auth-container');
+        const dashboardContainer = document.getElementById('dashboard-container');
+        const emailInput = document.getElementById('email');
+        const passwordInput = document.getElementById('password');
+        const btnLogin = document.getElementById('btn-login');
+        const btnSignup = document.getElementById('btn-signup');
+        const btnLogout = document.getElementById('btn-logout');
+        const userEmailSpan = document.getElementById('user-email');
+        const statusDiv = document.getElementById('status');
+
+        // Helper to update the UI state based on user session
+        function updateUI(session) {
+            if (session) {
+                authContainer.classList.add('hidden');
+                dashboardContainer.classList.remove('hidden');
+                userEmailSpan.textContent = session.user.email;
+                statusDiv.textContent = "Logged in successfully.";
+            } else {
+                authContainer.classList.remove('hidden');
+                dashboardContainer.classList.add('hidden');
+                userEmailSpan.textContent = "";
+                statusDiv.textContent = "Not logged in.";
+            }
+        }
+
+        // 3. Listen for Auth State Changes (Handles initial load, logins, logouts automatically)
+        supabase.auth.onAuthStateChange((event, session) => {
+            console.log('Auth state changed:', event, session);
+            updateUI(session);
+        });
+
+        // 4. Sign Up Logic
+        btnSignup.addEventListener('click', async () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            statusDiv.textContent = "Signing up...";
+
+            const { data, error } = await supabase.auth.signUp({ email, password });
+
+            if (error) {
+                statusDiv.textContent = `Error: ${error.message}`;
+            } else {
+                statusDiv.textContent = "Sign up successful! Check your email for a confirmation link.";
+            }
+        });
+
+        // 5. Log In Logic
+        btnLogin.addEventListener('click', async () => {
+            const email = emailInput.value;
+            const password = passwordInput.value;
+            statusDiv.textContent = "Logging in...";
+
+            const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+
+            if (error) {
+                statusDiv.textContent = `Error: ${error.message}`;
+            }
+        });
+
+        // 6. Log Out Logic
+        btnLogout.addEventListener('click', async () => {
+            statusDiv.textContent = "Logging out...";
+            const { error } = await supabase.auth.signOut();
+            
+            if (error) {
+                statusDiv.textContent = `Error: ${error.message}`;
+            }
+        });
+    </script>
+</body>
+</html>

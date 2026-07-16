@@ -63,7 +63,7 @@
 </head>
 <body class="bg-apple-bg text-apple-text min-h-screen flex items-center justify-center p-4 selection:bg-black selection:text-white antialiased">
 
-    <div id="auth-view" class="w-full max-w-[400px] bg-white rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] p-10 slide-up border border-white/50 relative overflow-hidden hidden">
+    <div id="auth-view" class="w-full max-w-[400px] bg-white rounded-[24px] shadow-[0_8px_32px_rgba(0,0,0,0.06)] p-10 slide-up border border-white/50 relative overflow-hidden">
         
         <div class="text-center mb-8">
             <h1 id="form-title" class="text-[28px] font-semibold tracking-tight mb-2">Sign In</h1>
@@ -122,11 +122,12 @@
     </div>
 
     <script>
-        // --- 1. YOUR CREDENTIALS HERE (FIXED) ---
+        // --- 1. YOUR CREDENTIALS HERE ---
         const SUPABASE_URL = 'https://ndgrpmglkdmdvqmhzxrp.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5kZ3JwbWdsa2RtZHZxbWh6eHJwIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODQxNzU2OTAsImV4cCI6MjA5OTc1MTY5MH0.Sett9S-neEhpdQQK8bes4ZEqLLRy_azKQ3AuVgPzVV0';
         
-        const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        // FIXED: Renamed local variable to supabaseClient to prevent crashing
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
         // --- 2. STATE & DOM ELEMENTS ---
         let isLoginMode = true;
@@ -166,7 +167,8 @@
         };
 
         // --- 4. AUTH STATE LISTENER ---
-        supabase.auth.onAuthStateChange((event, session) => {
+        // FIXED: Using supabaseClient
+        supabaseClient.auth.onAuthStateChange((event, session) => {
             if (session) {
                 views.auth.classList.add('hidden');
                 views.dashboard.classList.remove('hidden');
@@ -198,9 +200,10 @@
             const password = inputs.password.value;
 
             try {
+                // FIXED: Using supabaseClient
                 const { error } = isLoginMode 
-                    ? await supabase.auth.signInWithPassword({ email, password })
-                    : await supabase.auth.signUp({ email, password });
+                    ? await supabaseClient.auth.signInWithPassword({ email, password })
+                    : await supabaseClient.auth.signUp({ email, password });
 
                 if (error) throw error;
                 if (!isLoginMode) showMessage('Success! Check your email for a confirmation link.');
@@ -214,7 +217,8 @@
         // Google Login
         btns.google.addEventListener('click', async () => {
             setLoading(true);
-            const { error } = await supabase.auth.signInWithOAuth({
+            // FIXED: Using supabaseClient
+            const { error } = await supabaseClient.auth.signInWithOAuth({
                 provider: 'google',
                 options: { redirectTo: window.location.origin }
             });
@@ -228,7 +232,8 @@
         btns.logout.addEventListener('click', async () => {
             btns.logout.disabled = true;
             btns.logout.textContent = "Signing out...";
-            await supabase.auth.signOut();
+            // FIXED: Using supabaseClient
+            await supabaseClient.auth.signOut();
             btns.logout.disabled = false;
             btns.logout.textContent = "Sign Out";
         });
